@@ -111,3 +111,54 @@ def make_tokenized_instances(ls, text_col=""):
         tokens = [sent.string.strip().lower() for sent in spacy_doc if sent.string.strip().lower() not in stopwords]
         instances.append(tokens)
     return instances
+
+def is_number(s):
+    """
+
+    :param s:
+    :return:
+    """
+    try:
+        float(s)
+        return True
+    except ValueError:
+        return False
+
+def create_embeddings_dic(all_words, embeddings_path, num_dimensions):
+    """
+
+    :param all_words:
+    :param embeddings_path:
+    :param num_dimensions:
+    :return:
+    """
+    embeddings_dic = {}
+    print("Building embeddings dic from " + embeddings_path)
+    with open(embeddings_path, "rb") as infile:
+        next(infile)  # skip the header line with dimensions/vocab info
+        for line in infile:
+            # check if multi-word
+            parts = line.split()
+            lexical_entry = parts[:-num_dimensions]
+            if len(lexical_entry) > 1:
+                pass
+            else:
+                word = parts[0]
+                nums = map(float, parts[-num_dimensions:])
+                if word in all_words:
+                    embeddings_dic[word] = np.array(nums)
+    return embeddings_dic
+
+
+def check_embeddings(X, embeddings_dic):
+    print("looking at embeddings for X")
+    dim = len(embeddings_dic.itervalues().next())
+    words = X
+    print("row in X ", words)
+    for w in words:
+        print("looking at w ", w)
+        if w in embeddings_dic:
+            print("embedding ", embeddings_dic[w])
+    print("mean --> ", np.mean([embeddings_dic[w] for w in words if w in embeddings_dic]
+                             or [np.zeros(dim)], axis=0))
+

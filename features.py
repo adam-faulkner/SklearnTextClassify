@@ -49,7 +49,6 @@ class ItemSelector(BaseEstimator, TransformerMixin):
     def transform(self, data_dict):
         return data_dict[self.key]
 
-
 class NumExtractor(BaseEstimator, TransformerMixin):
     """Extract features from each document for DictVectorizer"""
     def __init__(self, key):
@@ -61,7 +60,6 @@ class NumExtractor(BaseEstimator, TransformerMixin):
     def transform(self, nums):
         return [{self.key: num}
                 for num in nums]
-
 
 class FeatExtractor(BaseEstimator, TransformerMixin):
     """Creates a list of features for a Pipeline."""
@@ -82,7 +80,6 @@ class FeatExtractor(BaseEstimator, TransformerMixin):
                         col[l] = "x"
                 features[l][i] = col[l]
         return features
-
 
 class MeanEmbeddingVectorizer(object):
 
@@ -139,3 +136,35 @@ class TfidfEmbeddingVectorizer(object):
                     [np.zeros(self.dim)], axis=0)
             for words in X
         ])
+
+def make_transformer_list(labels, embeddings_dic):
+    """
+    :param labels:
+    :param embeddings_dic:
+    :return: a list of tuples of the form (label, Pipeline object)
+    """
+    transformer_list =[]
+    for lab in labels:
+        print("doing ", lab)
+        if lab.endswith("embeddings"):
+            print("embeddings for  ", lab)
+            embed_transformer = (lab, Pipeline([
+            (lab + "_+selector", ItemSelector(key=lab)),
+            ("mean_embeddings", MeanEmbeddingVectorizer(embeddings_dic))]))
+            transformer_list.append(embed_transformer)
+        elif lab.endswith("bow"):
+            print("tfidf for ", lab)
+            bow_transformer= (lab, Pipeline([
+                (lab+"_+selector", ItemSelector(key=lab)),
+                ("bow_vectorizer", TfidfVectorizer(min_df=50))]))
+            transformer_list.append(bow_transformer)
+
+        else:
+             num_transformer = (lab, Pipeline([
+                 (lab + "_+selector", ItemSelector(key=lab)),
+                 ('num_vectorizer', NumExtractor(lab)),  # returns a list of dicts
+                 ('dict_vectorizer', DictVectorizer()),  # list of dicts -> feature matrix
+             ]))
+             transformer_list.append(num_transformer)
+    print("made transformer list of length ", len(transformer_list))
+    return transformer_list
