@@ -1,7 +1,7 @@
 # SklearnTextClassify
 
 
-This project implements basic text classification functionality using Sklearn. It will be of interest to anyone who'd like to  quickly run text classification experiments with a minimum of fuss and wrangling with the Sklearn API. Sklearn tends to make common feature generation functionality such as concatenation of different feature types (e.g., categorical and numeric types) an oddly difficult process. Several Stackoverflow exchanges testify to this.  Here, I've collected various solutions to creating heterogenous feature types in Sklearn along with more contemporary types such as embeddings-based features and made them availabel via a CLI. 
+This project implements basic text classification functionality using Sklearn. It will be of interest to anyone who'd like to  quickly run text classification experiments with a minimum of fuss and wrangling with the Sklearn API. Sklearn tends to make common feature generation functionality such as concatenation of different feature types (e.g., categorical and numeric types) difficult. Several Stackoverflow exchanges testify to this.  Here, I've collected various solutions to creating heterogenous feature types in Sklearn along with more contemporary types such as embeddings-based features. Simple classificaation experiments can be run with an appropriately formatted dataset using the CLI.  
 
 
 ## Example usage
@@ -93,8 +93,6 @@ Making google w2v dic
 Building embeddings dic from ./resources/GoogleNews-vectors-negative300.txt
 done
 Making pipeline
-('tfidf for ', 'text_bow')
-('embeddings for  ', 'text_embeddings')
 done
 ========================================
 
@@ -125,7 +123,7 @@ By default, the code will look for `GoogleNews-vectors-negative300.txt` (or `.bi
 
 ## Notes
 
-The example data is the classic movie review dataset of Pang & Lee (2004), available [here](http://www.cs.cornell.edu/people/pabo/movie-review-data/).  I've split this data into training, dev, test sets and used the sentiment lexicon of Liu, Hu, & Cheng to populate the `positive_num` and `negative_num` columns. 
+The example data is the classic movie review dataset of Pang & Lee (2004), available [here](http://www.cs.cornell.edu/people/pabo/movie-review-data/).  I've split this data into training, dev, and test sets and used the sentiment lexicon of Liu, Hu, & Cheng to populate the `positive_num` and `negative_num` columns. 
 
 
 ## References
