@@ -14,8 +14,11 @@ following to end of the header
   * $feature$num : For each item in a space separated string, count the item, and use the resulting count as a feature
   
   
-Here is an example from the review polarity dataset provided in the resources folder:
-
+Here is a (truncated) example from the review polarity dataset provided in the resources folder:
+doc_id	text_bow	text_embeddings	positive_num	negative_num	target
+| doc_id        | text_bow      | text_embeddings  | positive_num | negative_num|
+| ------------- |------------   | -----|
+| cv700_21947.txt | let start saying leading release latest bond film [..] | positive_word positive_word positive_word positive_word [..]| negative_word negative_word negative_word negative_word [...]|
 
 
 
