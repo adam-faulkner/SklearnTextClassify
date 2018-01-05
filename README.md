@@ -6,7 +6,17 @@ This project implements basic text classification functionality using Sklearn. I
 
 ## Example usage
 
-All data must have correctly formatted headings:
+The code determines feature types based on the data headers of your .tsv-formatted data. Simply add any of the 
+following to end of the header 
+  * $feature$bow : Standard tf-idf weighted bag-of-words vectorization
+  * $feature$embeddings : For each item (usually a word) in a space separated string, look up its embedding in an
+  accompanying embeddings file and average the combined embeddings of the string.
+  * $feature$num : For each item in a space separated string, count the item, and use the resulting count as a feature
+  
+  
+Here is an example from the review polarity dataset provided in the resources folder:
+
+
 
 
 
