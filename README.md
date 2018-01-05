@@ -125,4 +125,10 @@ By default, the code will look for `GoogleNews-vectors-negative300.txt` (or `.bi
 
 ## Notes
 
-The example data is the classic movie review dataset of 
+The example data is the classic movie review dataset of Pang & Lee (2004), available [here](http://www.cs.cornell.edu/people/pabo/movie-review-data/).  I've split this data into training, dev, test sets and used the sentiment lexicon of Liu, Hu, & Cheng to populate the `positive_num` and `negative_num` columns. 
+
+
+## References
+Bing Liu, Minqing Hu and Junsheng Cheng. "Opinion Observer: Analyzing and Comparing Opinions on the Web." Proceedings of the 14th International World Wide Web conference (WWW-2005), May 10-14, 2005, Chiba, Japan.
+
+Bo Pang and Lillian Lee, A Sentimental Education: Sentiment Analysis Using Subjectivity Summarization Based on Minimum Cuts, Proceedings of ACL 2004. 
