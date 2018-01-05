@@ -22,7 +22,7 @@ Here is a (truncated) example from the review polarity dataset provided in the r
 
 `text_bow` will be processed as a vector of tf-idf-weighted counts, `text_embeddings` will undergo the mean-embeddings transformation described above and `positive-` and `negative-num` will be transformed into real-valued features. 
 
-`cli.py` provides all of the required functionality.  All commands are available via `-h`:
+`cli.py` provides all of the required functionality.  All commands can be viewed via `-h`:
 
 ```
 $python ./cli.py -h
