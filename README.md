@@ -118,3 +118,11 @@ Accuracy: 0.802
 ========================================
 ```
   
+## Embeddings
+
+By default, the code will look for `GoogleNews-vectors-negative300.txt` (or `.bin`) in the `resources` folder. Get these  from [here](https://github.com/mmihaltz/word2vec-GoogleNews-vectors). 
+
+
+## Notes
+
+The example data is the classic movie review dataset of 
