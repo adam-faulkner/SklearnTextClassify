@@ -82,10 +82,9 @@ class FeatExtractor(BaseEstimator, TransformerMixin):
         return features
 
 class MeanEmbeddingVectorizer(object):
-
-    '''From https://github.com/nadbordrozd/blog_stuff/tree/master/classification_w2v
+    """ From https://github.com/nadbordrozd/blog_stuff/tree/master/classification_w2v
         Creates a feature based on the mean of the embeddings of all words
-        in a string'''
+        in a string"""
     def __init__(self, embeddings_dic):
         self.embeddings_dic = embeddings_dic
         self.dim = len(embeddings_dic.itervalues().next())
@@ -159,12 +158,14 @@ def make_transformer_list(labels, embeddings_dic):
                 ("bow_vectorizer", TfidfVectorizer(min_df=50))]))
             transformer_list.append(bow_transformer)
 
-        else:
+        elif lab.endswith("num"):
              num_transformer = (lab, Pipeline([
                  (lab + "_+selector", ItemSelector(key=lab)),
                  ('num_vectorizer', NumExtractor(lab)),  # returns a list of dicts
                  ('dict_vectorizer', DictVectorizer()),  # list of dicts -> feature matrix
              ]))
              transformer_list.append(num_transformer)
-    print("made transformer list of length ", len(transformer_list))
+        else:
+            raise ValueError("Feature type not recognized. All feature headers must end with 'bow', 'embeddings', or 'num'")
+    print("Made transformer list of length ", len(transformer_list))
     return transformer_list

@@ -1,7 +1,9 @@
 import re
+from collections import defaultdict, Counter
 import numpy as np
 import spacy
-
+from sklearn.feature_extraction import DictVectorizer
+import pandas as pd
 nlp = spacy.load('en')
 stopwords = [s.strip() for s in open("./resources/stopwords_custom.txt").readlines()]
 
@@ -9,6 +11,7 @@ stopwords = [s.strip() for s in open("./resources/stopwords_custom.txt").readlin
 def clean_str(string):
     """
     From https://github.com/yoonkim/CNN_sentence/blob/master/process_data.py
+
     :param string:
     :return: string
     """
@@ -29,7 +32,7 @@ def clean_str(string):
 
 def load_embedding_vectors_word2vec(vocabulary, filename, binary):
     """
-     Fro https://github.com/nadbordrozd/blog_stuff/tree/master/classification_w2v
+     From https://github.com/nadbordrozd/blog_stuff/tree/master/classification_w2v
      load embedding_vectors from word2vec
     
     :param vocabulary: 
@@ -101,7 +104,7 @@ def make_tokenized_instances(ls, text_col=""):
     This is mainly used to create the data used by the embeddings-dic code
     :param ls:
     :param text_col:
-    :return:
+    :return: list of lists
     """
     instances =[]
     text_ls = ls
@@ -114,9 +117,8 @@ def make_tokenized_instances(ls, text_col=""):
 
 def is_number(s):
     """
-
     :param s:
-    :return:
+    :return: boolean
     """
     try:
         float(s)
@@ -126,7 +128,6 @@ def is_number(s):
 
 def create_embeddings_dic(all_words, embeddings_path, num_dimensions):
     """
-
     :param all_words:
     :param embeddings_path:
     :param num_dimensions:
@@ -161,4 +162,98 @@ def check_embeddings(X, embeddings_dic):
             print("embedding ", embeddings_dic[w])
     print("mean --> ", np.mean([embeddings_dic[w] for w in words if w in embeddings_dic]
                              or [np.zeros(dim)], axis=0))
+
+
+def add_extras(y, cls_cols):
+    for l in list(set(y)):
+        if l not in cls_cols:
+            cls_cols.append(l)
+    return cls_cols
+
+
+def one_hot_dataframe(data, cols, replace=False):
+    vec = DictVectorizer()
+    mkdict = lambda row: dict((col, row[col]) for col in cols)
+    vecData = pd.DataFrame(vec.fit_transform(data[cols].apply(mkdict, axis=1)).toarray())
+    vecData.columns = vec.get_feature_names()
+    vecData.index = data.index
+    if replace is True:
+        data = data.drop(cols, axis=1)
+        data = data.join(vecData)
+    return (data, vecData, vec)
+
+
+def dic_check(dic, ky):
+    if dic.get(ky) is not None:
+        return True
+    return False
+
+
+def make_num_feature_from_bow(df, col_label, categories, raw_freq=False):
+    """
+    Counts the occurence of a label in a seq and returns
+    n new cols where n is the number of unique tags. Returns a modified
+    version of the df with the n categories added
+    :param df:
+    :param col_label:
+    :param categories:
+    :param raw_freq:
+    :return: pandas dataframe augmented with new columns
+    """
+    all_dicts = []
+    the_col = list(df[col_label])
+
+    if raw_freq:
+        new_col = []
+        for s in the_col:
+            if s and (type(s) != float and type(s) != np.float64):
+                    new_col.append(len(s.split()))
+            else:
+                new_col.append(0)
+        df[col_label+"_count"] = new_col
+        return df
+    for idx, r in enumerate(the_col):
+        if type(r) == float:
+            r = "neutral"
+       # print("doing ",r, " at ", idx)
+        very_spt =r.split("very")
+       # print("very splt", very_spt)
+        cat_tags = []
+        for item in very_spt:
+            if item.startswith(" "):
+                tag = "very " + item.split()[0]
+                cat_tags.append(tag)
+                for s in item.split()[1:]:
+                    cat_tags.append(s)
+            else:
+                for s in item.split():
+                    cat_tags.append(s)
+
+        sent_tags = [st.strip() for st in cat_tags]
+        #print("sent tags ", sent_tags)
+        sent_cnt = dict(Counter(sent_tags))
+        # for k, v in dict(cnt).items():
+        # get sentiment polarity counts
+        processed_feat_dict = {}
+
+        for c in categories:
+            processed_feat_dict[c] = 0
+        #print("sent tags ", sent_tags)
+        for tag in sent_tags:
+            #print("doing tag ", tag)
+            #if dic_check(sent_cnt, tag):
+    #        if tag in categories:
+             processed_feat_dict[tag+"_count"] = sent_cnt[tag]
+        all_dicts.append(processed_feat_dict)
+    #for each cat in categories make a new df column
+    dd = defaultdict(list)
+    for d in all_dicts:  # you can list as many input dicts as you want here
+        for key, value in d.iteritems():
+            dd[key].append(value)
+    for cat in categories:
+        new_col = []
+        for d in all_dicts:
+            new_col.append(d[cat])
+        df[cat] = new_col
+    return df
 
