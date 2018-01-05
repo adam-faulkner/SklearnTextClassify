@@ -152,7 +152,6 @@ def create_embeddings_dic(all_words, embeddings_path, num_dimensions):
 
 
 def check_embeddings(X, embeddings_dic):
-    print("looking at embeddings for X")
     dim = len(embeddings_dic.itervalues().next())
     words = X
     print("row in X ", words)
@@ -194,7 +193,7 @@ def make_num_feature_from_bow(df, col_label, categories, raw_freq=False):
     Counts the occurence of a label in a seq and returns
     n new cols where n is the number of unique tags. Returns a modified
     version of the df with the n categories added
-    :param df:
+    :param df: pandas dataframe
     :param col_label:
     :param categories:
     :param raw_freq:
@@ -202,7 +201,6 @@ def make_num_feature_from_bow(df, col_label, categories, raw_freq=False):
     """
     all_dicts = []
     the_col = list(df[col_label])
-
     if raw_freq:
         new_col = []
         for s in the_col:
@@ -215,9 +213,7 @@ def make_num_feature_from_bow(df, col_label, categories, raw_freq=False):
     for idx, r in enumerate(the_col):
         if type(r) == float:
             r = "neutral"
-       # print("doing ",r, " at ", idx)
         very_spt =r.split("very")
-       # print("very splt", very_spt)
         cat_tags = []
         for item in very_spt:
             if item.startswith(" "):
@@ -230,22 +226,13 @@ def make_num_feature_from_bow(df, col_label, categories, raw_freq=False):
                     cat_tags.append(s)
 
         sent_tags = [st.strip() for st in cat_tags]
-        #print("sent tags ", sent_tags)
         sent_cnt = dict(Counter(sent_tags))
-        # for k, v in dict(cnt).items():
-        # get sentiment polarity counts
         processed_feat_dict = {}
-
         for c in categories:
             processed_feat_dict[c] = 0
-        #print("sent tags ", sent_tags)
         for tag in sent_tags:
-            #print("doing tag ", tag)
-            #if dic_check(sent_cnt, tag):
-    #        if tag in categories:
              processed_feat_dict[tag+"_count"] = sent_cnt[tag]
         all_dicts.append(processed_feat_dict)
-    #for each cat in categories make a new df column
     dd = defaultdict(list)
     for d in all_dicts:  # you can list as many input dicts as you want here
         for key, value in d.iteritems():

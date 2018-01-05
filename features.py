@@ -5,7 +5,6 @@ from utils import make_tokenized_instances
 from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.feature_extraction import DictVectorizer
 from sklearn.feature_extraction.text import TfidfVectorizer
-from sklearn.pipeline import FeatureUnion
 from sklearn.pipeline import Pipeline
 
 class ItemSelector(BaseEstimator, TransformerMixin):
@@ -144,7 +143,6 @@ def make_transformer_list(labels, embeddings_dic):
     """
     transformer_list =[]
     for lab in labels:
-        print("doing ", lab)
         if lab.endswith("embeddings"):
             print("embeddings for  ", lab)
             embed_transformer = (lab, Pipeline([
@@ -167,5 +165,4 @@ def make_transformer_list(labels, embeddings_dic):
              transformer_list.append(num_transformer)
         else:
             raise ValueError("Feature type not recognized. All feature headers must end with 'bow', 'embeddings', or 'num'")
-    print("Made transformer list of length ", len(transformer_list))
     return transformer_list

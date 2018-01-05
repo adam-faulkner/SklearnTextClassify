@@ -28,7 +28,7 @@ parser.add_argument('-feat_list', nargs='+', help='Provide a space-separated lis
 
 parser.add_argument('-class_col', action='store', dest='class_col', help="The column header of the class column; default is 'target'")
 
-parser.add_argument('-labels', nargs='+', help='Provide a space-separated list of class labels. Default is "pos" and "negative" ',dest="label_collection")
+parser.add_argument('-labels', nargs='+', help='Provide a space-separated list of class labels. Default is "pos" and "neg" ',dest="label_collection")
 
 parser.add_argument('-cl', '--classifier' ,action='store', dest='classifier',
                     help='The classifier to use. Supported classifiers: '+classifiers)
@@ -60,6 +60,7 @@ panda_file_dev = pd.read_csv("./resources/review_polarity_dev.tsv", delimiter="\
 panda_file_train = pd.read_csv("./resources/review_polarity_train.tsv", delimiter="\t",encoding = "latin1")
 panda_file_test = pd.read_csv("./resources/review_polarity_test.tsv", delimiter="\t",encoding = "latin1")
 
+user_provided_dev = False
 
 #get args from commandline (if any)
 if (results.class_col is not None):
@@ -68,8 +69,18 @@ else:
     class_col = "target"
 
 if (results.train_path is not None):
-    assert os.path.isfile(results.train_path)# Check parameters validity
-    panda_file_train = results.train_path
+    assert os.path.isfile(results.train_path)# Check parameter's validity
+    panda_file_train =  pd.read_csv(results.train_path, delimiter="\t",encoding = "latin1")
+
+if (results.dev_path is not None):
+    assert os.path.isfile(results.train_path)# Check parameter's validity
+    panda_file_dev = pd.read_csv(results.dev_path, delimiter="\t",encoding = "latin1")
+    user_provided_dev = True
+
+
+if (results.test_path is not None):
+    assert os.path.isfile(results.train_path)# Check parameter's validity
+    panda_file_test = pd.read_csv(results.test_path, delimiter="\t",encoding = "latin1")
 
 if (results.mult_feat_collection is not None):
     features = results.mult_feat_collection
@@ -91,8 +102,6 @@ else:
     save_model_path = "../models/"
 
 
-
-
 print "Using classifier ",classifier
 print "Using features ", features
 print "Using class labels ", class_labels
@@ -106,18 +115,15 @@ def create_cat_features(df, categories):
     return new_df
 
 num_features = [cat for cat in features if cat.endswith("num")]
-new_dev_df = create_cat_features(panda_file_dev,num_features)
-new_train_df = create_cat_features(panda_file_train,num_features )
-new_test_df = create_cat_features(panda_file_test, num_features)
 
-new_dev_df = new_dev_df.fillna("x")
-new_train_df = new_train_df.fillna("x")
-new_test_df = new_test_df.fillna("x")
+if user_provided_dev: #the dev set serves as the test set
+    new_test_df = create_cat_features(panda_file_dev, num_features)
+    new_test_df = new_test_df.fillna("x")
+else:
+    new_train_df = create_cat_features(panda_file_train,num_features )
+    new_test_df = create_cat_features(panda_file_test, num_features)
+    new_train_df = new_train_df.fillna("x")
+    new_test_df = new_test_df.fillna("x")
 
-print("Available labels: ", new_train_df.columns.values)
 
-print "passing these features to classify ", features
-print "here are the cols for train ", new_train_df.columns.values
-print "here are the cols for test ", new_test_df.columns.values
-
-classify(new_train_df, new_test_df, class_labels, features, class_col, classifier, embed=True,   embeddings_dic="glove", model_path ="../models/2018-01-04LogisticRegression", save_model=True)
+classify(new_train_df, new_test_df, class_labels, features, class_col, classifier, embed=True,   embeddings_dic="w2v_google", model_path ="../models/2018-01-04LogisticRegression", save_model=True)

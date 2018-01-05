@@ -3,14 +3,10 @@ from utils import create_embeddings_dic
 from features import make_transformer_list
 from sklearn.pipeline import Pipeline
 from sklearn.pipeline import FeatureUnion
-from sklearn.metrics import confusion_matrix, accuracy_score, f1_score, precision_score, recall_score, classification_report
+from sklearn.metrics import confusion_matrix
 from sklearn.metrics import cohen_kappa_score
-from collections import Counter
-import pandas as pd
 from sklearn import metrics
 from features import FeatExtractor
-from sklearn.linear_model import LogisticRegression
-from utils import make_num_feature_from_bow
 
 GOOGLE_W2V = "./resources/GoogleNews-vectors-negative300.txt"
 GLOVE = "./resources/glove.6B.300d.txt"
