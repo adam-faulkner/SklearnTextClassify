@@ -20,9 +20,9 @@ Here is a (truncated) example from the review polarity dataset provided in the r
 | ------------- |---------------| -----------------| -----------------| -----------------
 | cv700_21947.txt | latest bond film  | latest bond film |positive_word positive_word | negative_word negative_word negative_word 
 
+`text_bow` will be processed as a vector of tf-idf-weighted counts, `text_embeddings` will undergo the mean-embeddings transformation described above and `positive-` and `negative-num` will be transformed into real-valued features. 
 
-
-
+`cli.py` provides all of the required functionality.  All commands are available via `-h`:
 
 ```
 $python ./cli.py -h
@@ -66,6 +66,7 @@ optional arguments:
                         saved
   -cross_valid          Boolean. Use 5 fold cross validation; default is False
   ```
+  An example training session using review polarity training and test sets with Logistic Regression as a classifier:
   
   ```
 $python ./cli.py -train_path ./resources/review_polarity_train.tsv -test_path ./resources/review_polarity_test.tsv -feat_list text_bow text_embeddings positive_num negative_num -class_col target -labels pos neg -cl log_reg
