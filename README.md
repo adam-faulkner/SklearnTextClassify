@@ -66,7 +66,7 @@ optional arguments:
                         saved
   -cross_valid          Boolean. Use 5 fold cross validation; default is False
   ```
-  An example training session using review polarity training and test sets with Logistic Regression as a classifier:
+  An example training session using the review polarity training and test sets with Logistic Regression as a classifier:
   
   ```
 $python ./cli.py -train_path ./resources/review_polarity_train.tsv -test_path ./resources/review_polarity_test.tsv -feat_list text_bow text_embeddings positive_num negative_num -class_col target -labels pos neg -cl log_reg
