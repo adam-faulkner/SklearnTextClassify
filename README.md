@@ -15,10 +15,10 @@ following to end of the header
   
   
 Here is a (truncated) example from the review polarity dataset provided in the resources folder:
-doc_id	text_bow	text_embeddings	positive_num	negative_num	target
-| doc_id        | text_bow      | text_embeddings  | positive_num     | negative_num     |
-| ------------- |---------------| -----------------| -----------------| -----------------|
-| cv700_21947.txt | latest bond film [..] | positive_word positive_word | negative_word negative_word negative_word [...]|
+
+| doc_id        | text_bow      | text_embeddings  | positive_num     | negative_num     
+| ------------- |---------------| -----------------| -----------------| -----------------
+| cv700_21947.txt | latest bond film  | positive_word positive_word | negative_word negative_word negative_word 
 
 
 
