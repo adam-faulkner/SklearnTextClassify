@@ -3,6 +3,14 @@
 
 This project implements basic text classification functionality using Sklearn. It will be of interest to anyone who'd like to  quickly run text classification experiments with a minimum of fuss and wrangling with the Sklearn API. Sklearn tends to make common feature generation functionality such as concatenation of different feature types (e.g., categorical and numeric types) an oddly difficult process. Several Stackoverflow exchanges testify to this.  Here, I've collected various solutions to creating heterogenous feature types in Sklearn along with more contemporary types such as embeddings-based features. 
 
+
+## Example usage
+
+All data must have correctly formatted headings:
+
+
+
+
 ```
 $python ./cli.py -h
 
@@ -45,3 +53,54 @@ optional arguments:
                         saved
   -cross_valid          Boolean. Use 5 fold cross validation; default is False
   ```
+  
+  ```
+$python ./cli.py -train_path ./resources/review_polarity_train.tsv -test_path ./resources/review_polarity_test.tsv -feat_list text_bow text_embeddings positive_num negative_num -class_col target -labels pos neg -cl log_reg
+
+    Warning: no model found for 'en'
+
+    Only loading the 'en' tokenizer.
+
+user provided train path = ./resources/review_polarity_train.tsv
+user provided test path = ./resources/review_polarity_test.tsv
+user provided dev set path = None
+user provided feature list =  ['text_bow', 'text_embeddings', 'positive_num', 'negative_num']
+user provided classifier =  log_reg
+user provided labels =  ['pos', 'neg']
+user provided class column =  target
+user provided path to save the model to =  None
+Using classifier  LogisticRegression(C=1.0, class_weight=None, dual=False, fit_intercept=True,
+          intercept_scaling=1, max_iter=100, multi_class='ovr', n_jobs=1,
+          penalty='l2', random_state=None, solver='liblinear', tol=0.0001,
+          verbose=0, warm_start=False)
+Using features  ['text_bow', 'text_embeddings', 'positive_num', 'negative_num']
+Using class labels  ['pos', 'neg']
+Making google w2v dic
+Building embeddings dic from ./resources/GoogleNews-vectors-negative300.txt
+done
+Making pipeline
+('tfidf for ', 'text_bow')
+('embeddings for  ', 'text_embeddings')
+done
+========================================
+
+
+[[162  38]
+ [ 41 159]]
+
+
+             precision    recall  f1-score   support
+
+        neg       0.81      0.80      0.80       203
+        pos       0.80      0.81      0.80       197
+
+avg / total       0.80      0.80      0.80       400
+
+
+Kappa: 0.605
+
+Accuracy: 0.802
+
+========================================
+```
+  
