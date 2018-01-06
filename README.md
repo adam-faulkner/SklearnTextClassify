@@ -14,13 +14,13 @@ following to the end of the header
   * `num` : For each item in a space separated string, count the item, and use the resulting count as a feature
   
 
-Here is a (truncated) example from the review polarity dataset provided in the resources folder:
+Here is a (truncated) example from the review polarity dataset provided in the `resources` folder:
 
 | doc_id        | text_bow      | text_embeddings  | positive_num     | negative_num     
 | ------------- |---------------| -----------------| -----------------| -----------------
 | cv700_21947.txt | latest bond film  | latest bond film |positive_word positive_word | negative_word negative_word negative_word 
 
-`text_bow` will be processed as a vector of tf-idf-weighted counts, `text_embeddings` will undergo the mean-embeddings transformation described above and `positive-` and `negative-num` will be transformed into real-valued features. 
+`text_bow` will be processed as a vector of tf-idf-weighted counts, `text_embeddings` will undergo the mean-embeddings transformation described above and `positive_` and `negative_num` will be transformed into real-valued features. 
 
 `cli.py` provides all of the required functionality.  All commands can be viewed via `-h`:
 
