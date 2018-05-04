@@ -60,6 +60,33 @@ class NumExtractor(BaseEstimator, TransformerMixin):
         return [{self.key: num}
                 for num in nums]
 
+
+class TypeSelector(BaseEstimator, TransformerMixin):
+    '''
+    https://www.bigdatarepublic.nl/integrating-pandas-and-scikit-learn-with-pipelines/
+    '''
+    def __init__(self, dtype):
+        self.dtype = dtype
+
+
+    def fit(self, X, y=None):
+        return self
+
+    def transform(self, X):
+        return X.select_dtypes(include=[self.dtype])
+
+class StringIndexer(BaseEstimator, TransformerMixin):
+    '''
+    https://www.bigdatarepublic.nl/integrating-pandas-and-scikit-learn-with-pipelines/
+    '''
+    def fit(self, X, y=None):
+        return self
+
+    def transform(self, X):
+        return X.apply(lambda s: s.cat.codes.replace(
+            {-1: len(s.cat.categories)}
+        ))
+
 class FeatExtractor(BaseEstimator, TransformerMixin):
     """Creates a list of features for a Pipeline."""
     def __init__(self, labels):
@@ -70,11 +97,10 @@ class FeatExtractor(BaseEstimator, TransformerMixin):
 
     def transform(self, posts):
         dtype_ls =[(label, object) for label in self.labels]
-        features = np.recarray(shape=(len(posts),),
-                               dtype=dtype_ls)
+        features = np.recarray(shape=(len(posts),),dtype=dtype_ls)
         for l in self.labels:
             for i, col in posts.iterrows():
-                if l.endswith("bow"): #don't break if there's no text
+                if l.endswith("bow") or "ngrams" in l:
                     if not col[l]:
                         col[l] = "x"
                 features[l][i] = col[l]
@@ -86,7 +112,7 @@ class MeanEmbeddingVectorizer(object):
         in a string"""
     def __init__(self, embeddings_dic):
         self.embeddings_dic = embeddings_dic
-        self.dim = len(embeddings_dic.itervalues().next())
+        self.dim = len(embeddings_dic[next(iter(embeddings_dic))]) #.values())
 
     def fit(self, X, y):
         return self
@@ -97,7 +123,6 @@ class MeanEmbeddingVectorizer(object):
         then, take the mean of that vector of embeddings.If w is not in the embeddings_dic,
         then use a vector of zeros
         """
-
         X = make_tokenized_instances(list(X))
         vec =  np.array([
             np.mean([self.embeddings_dic[w] for w in words if w in self.embeddings_dic]
@@ -135,34 +160,55 @@ class TfidfEmbeddingVectorizer(object):
             for words in X
         ])
 
-def make_transformer_list(labels, embeddings_dic):
-    """
+
+def make_transformer_list(labels, embed_dic=None, additional_transformer_feature_labels = None, addtional_transformers=None):
+    '''
     :param labels:
-    :param embeddings_dic:
-    :return: a list of tuples of the form (label, Pipeline object)
-    """
+    :param emebd_dic include an embded dic if one of your labels includes
+
+    :return: a list of transformer objects
+    '''
     transformer_list =[]
     for lab in labels:
-        if lab.endswith("embeddings"):
-            print("embeddings for  ", lab)
+        if "ngrams" in lab or "bow" in lab:
+            print("ngrams. Doing "+lab)
+            ngram_order = 1
+            if re.findall('[0-9]', lab[-1]):
+                ngram_order = int(lab[-1])
+
+            ngram_trans = Pipeline([
+                (lab + "_selector", ItemSelector(key=lab)),
+                ("tfidf", TfidfVectorizer(ngram_range=(ngram_order, ngram_order))),
+                 ('scaler',  StandardScaler(with_mean=False)),
+            ])
+            ngram_idf_transformer= (lab,ngram_trans)
+            transformer_list.append(ngram_idf_transformer)
+        elif "num" in lab:
+            num_transformer = (lab, Pipeline([
+                 (lab+'_selector', TypeSelector(np.number)),
+                ('scaler', StandardScaler()),
+            ]))
+            transformer_list.append(num_transformer)
+        elif "bool" in lab:
+            bool_transformer = (lab, Pipeline([
+                ('selector', TypeSelector('bool')),
+            ]))
+            transformer_list.append(bool_transformer)
+
+        elif "embeddings" in lab:
+            print("embeddings. Doing " + lab)
+
+        elif "embeddings" in lab and embed_dic is not None:
             embed_transformer = (lab, Pipeline([
             (lab + "_+selector", ItemSelector(key=lab)),
-            ("mean_embeddings", MeanEmbeddingVectorizer(embeddings_dic))]))
+            ("mean_embeddings", MeanEmbeddingVectorizer(embed_dic))]))
             transformer_list.append(embed_transformer)
-        elif lab.endswith("bow"):
-            print("tfidf for ", lab)
-            bow_transformer= (lab, Pipeline([
-                (lab+"_+selector", ItemSelector(key=lab)),
-                ("bow_vectorizer", TfidfVectorizer(min_df=50))]))
-            transformer_list.append(bow_transformer)
-
-        elif lab.endswith("num"):
-             num_transformer = (lab, Pipeline([
-                 (lab + "_+selector", ItemSelector(key=lab)),
-                 ('num_vectorizer', NumExtractor(lab)),  # returns a list of dicts
-                 ('dict_vectorizer', DictVectorizer()),  # list of dicts -> feature matrix
-             ]))
-             transformer_list.append(num_transformer)
         else:
-            raise ValueError("Feature type not recognized. All feature headers must end with 'bow', 'embeddings', or 'num'")
+            print("category. Doing " + lab)
+            cat_transformer = (lab, Pipeline([
+                (lab+'_selector', TypeSelector('category')),
+                ('labeler', StringIndexer()),
+                ('encoder', OneHotEncoder(handle_unknown='ignore')),
+            ]))
+            transformer_list.append(cat_transformer)
     return transformer_list
