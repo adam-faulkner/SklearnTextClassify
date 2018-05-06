@@ -1,4 +1,4 @@
-
+import re
 import numpy as np
 from collections import defaultdict
 from utils import make_tokenized_instances
@@ -6,6 +6,8 @@ from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.feature_extraction import DictVectorizer
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.pipeline import Pipeline
+from sklearn.preprocessing import OneHotEncoder, StandardScaler
+import pandas as pd
 
 class ItemSelector(BaseEstimator, TransformerMixin):
     """
@@ -68,12 +70,13 @@ class TypeSelector(BaseEstimator, TransformerMixin):
     def __init__(self, dtype):
         self.dtype = dtype
 
-
     def fit(self, X, y=None):
         return self
 
     def transform(self, X):
+        print("trying to do ", self.dtype)
         return X.select_dtypes(include=[self.dtype])
+
 
 class StringIndexer(BaseEstimator, TransformerMixin):
     '''
@@ -179,7 +182,7 @@ def make_transformer_list(labels, embed_dic=None, additional_transformer_feature
             ngram_trans = Pipeline([
                 (lab + "_selector", ItemSelector(key=lab)),
                 ("tfidf", TfidfVectorizer(ngram_range=(ngram_order, ngram_order))),
-                 ('scaler',  StandardScaler(with_mean=False)),
+                ('scaler',  StandardScaler(with_mean=False)),
             ])
             ngram_idf_transformer= (lab,ngram_trans)
             transformer_list.append(ngram_idf_transformer)

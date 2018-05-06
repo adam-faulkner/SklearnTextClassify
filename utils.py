@@ -5,6 +5,7 @@ import spacy
 from sklearn.feature_extraction import DictVectorizer
 import pandas as pd
 nlp = spacy.load('en')
+
 stopwords = [s.strip() for s in open("./resources/stopwords_custom.txt").readlines()]
 
 
@@ -109,7 +110,7 @@ def make_tokenized_instances(ls, text_col=""):
     instances =[]
     text_ls = ls
     for text in text_ls:
-        spacy_doc = nlp(re.sub("[^a-zA-Z]+", " ", unicode(text)))
+        spacy_doc = nlp(re.sub("[^a-zA-Z]+", " ", text))
         # don't use NLTK or Spacy's stopwords
         tokens = [sent.string.strip().lower() for sent in spacy_doc if sent.string.strip().lower() not in stopwords]
         instances.append(tokens)

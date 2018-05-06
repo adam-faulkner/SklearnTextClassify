@@ -7,10 +7,9 @@ from sklearn.metrics import confusion_matrix
 from sklearn.metrics import cohen_kappa_score
 from sklearn import metrics
 from features import FeatExtractor
+from sklearn.svm import LinearSVC
 
 GOOGLE_W2V = "./resources/GoogleNews-vectors-negative300.txt"
-GLOVE = "./resources/glove.6B.300d.txt"
-
 
 def classify(train_df, test_df, class_labels, feature_labels, target_col, classifier, embed=False,embeddings_dic="glove",
              model_path="../models/", save_model=False):
@@ -23,10 +22,7 @@ def classify(train_df, test_df, class_labels, feature_labels, target_col, classi
             print("Making google w2v dic")
             embed_dic = create_embeddings_dic(set(w for words in all_instances for w in words),GOOGLE_W2V , 300)
             print("done")
-        elif embeddings_dic=="glove":
-            print("Making glove dic")
-            embed_dic = create_embeddings_dic(set(w for words in all_instances for w in words),GLOVE , 300)
-            print("done")
+
     y_tr = list(train_df[target_col])
     y_ts = list(test_df[target_col])
     print("Making pipeline")
@@ -51,6 +47,5 @@ def classify(train_df, test_df, class_labels, feature_labels, target_col, classi
     print("\n")
     kappa = cohen_kappa_score(y_ts, y_pred)
     print(report)
-    print("\nKappa: " + str(kappa) + "\n")
     print("Accuracy: {:0.3f}".format(metrics.accuracy_score(y_ts, y_pred))) + "\n"
     print("========================================")

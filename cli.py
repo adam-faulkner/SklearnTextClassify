@@ -7,7 +7,8 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.neural_network import MLPClassifier
 from utils import make_num_feature_from_bow
 from train import classify
-
+from sklearn.svm import LinearSVC
+import numpy as np
 
 all_features =["text_bow", "text_embeddings", "positive_num", "negative_num"]
 
@@ -42,17 +43,17 @@ parser.add_argument('-save_model_path', action='store', dest='save_model_path',
 parser.add_argument('-cross_valid', action="store_true", dest="cross_valid_bool", default=False, help="Boolean. Use 5 fold cross validation; default is False")
 
 results = parser.parse_args()
-print 'user provided train path =', results.train_path
-print 'user provided test path =', results.test_path
-print 'user provided dev set path =', results.dev_path
-print 'user provided feature list = ', results.mult_feat_collection
-print 'user provided classifier = ', results.classifier
-print 'user provided labels = ', results.label_collection
-print 'user provided class column = ', results.class_col
-print 'user provided path to save the model to = ', results.save_model_path
+print('user provided train path =', results.train_path)
+print('user provided test path =', results.test_path)
+print('user provided dev set path =', results.dev_path)
+print('user provided feature list = ', results.mult_feat_collection)
+print('user provided classifier = ', results.classifier)
+print('user provided labels = ', results.label_collection)
+print('user provided class column = ', results.class_col)
+print('user provided path to save the model to = ', results.save_model_path)
 
 classifier_dic= {"mlp":MLPClassifier(),"naive_bayes_bernouli":BernoulliNB() , "naive_bayes_multinomial": MultinomialNB() ,  "random_forest":RandomForestClassifier(class_weight="balanced"),
-                 "log_reg_balanced": LogisticRegression(class_weight="balanced"), "log_reg": LogisticRegression()}
+                 "log_reg_balanced": LogisticRegression(class_weight="balanced"), "log_reg": LogisticRegression(), "svm":LinearSVC()}
 
 #default values for all args
 classifier = classifier_dic["log_reg"]
@@ -102,28 +103,30 @@ else:
     save_model_path = "../models/"
 
 
-print "Using classifier ",classifier
-print "Using features ", features
-print "Using class labels ", class_labels
+print("Using classifier ",classifier)
+print("Using features ", features)
+print("Using class labels ", class_labels)
 
 #process categorical and numeric features in the dataframe
 
-def create_cat_features(df, categories):
-    new_df = df
-    for category in categories:
-        new_df = make_num_feature_from_bow(df, category,[""], raw_freq=True)
-    return new_df
-
-num_features = [cat for cat in features if cat.endswith("num")]
+def make_cats(df, feats):
+    for feat in feats:
+        if "cat" in feat:
+            df[feat] = df[feat].astype('category')
+    return df
 
 if user_provided_dev: #the dev set serves as the test set
-    new_test_df = create_cat_features(panda_file_dev, num_features)
-    new_test_df = new_test_df.fillna("x")
+    new_test_df = make_cats(panda_file_dev, features)
+    #new_test_df = new_test_df.fillna("x")
 else:
-    new_train_df = create_cat_features(panda_file_train,num_features )
-    new_test_df = create_cat_features(panda_file_test, num_features)
-    new_train_df = new_train_df.fillna("x")
-    new_test_df = new_test_df.fillna("x")
+    new_train_df = make_cats(panda_file_train, features)
+    new_test_df = make_cats(panda_file_test, features)
+    #new_train_df = new_train_df.fillna("x")
+    #new_test_df = new_test_df.fillna("x")
 
-
-classify(new_train_df, new_test_df, class_labels, features, class_col, classifier, embed=True,   embeddings_dic="w2v_google", model_path ="../models/2018-01-04LogisticRegression", save_model=True)
+boolean_columns = new_train_df.select_dtypes(include=['bool'])
+# Selecting numericals
+numerical_columns = new_train_df.select_dtypes(include=[np.number])
+print(boolean_columns)
+print(numerical_columns)
+classify(new_train_df, new_test_df, class_labels, features, class_col, classifier, embed=False,   embeddings_dic="w2v_google", model_path ="../models/2018-01-04LogisticRegression", save_model=True)
