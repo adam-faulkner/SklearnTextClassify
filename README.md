@@ -124,7 +124,7 @@ By default, the code will look for `GoogleNews-vectors-negative300.txt` (or `.bi
 
 ## Notes
 
-The example data is the classic movie review dataset of Pang & Lee (2004), available [here](http://www.cs.cornell.edu/people/pabo/movie-review-data/).  I've split this data into training, dev, and test sets and used the sentiment lexicon of Liu, Hu, & Cheng to populate the `positive_num` and `negative_num` columns. 
+The example data is the classic movie review dataset of Pang & Lee (2004), available [here](http://www.cs.cornell.edu/people/pabo/movie-review-data/).  I've split this data into training, dev, and test sets,used the sentiment lexicon of Liu, Hu, & Cheng to populate the `pos_num` and `neg_num` columns, and used NLTK's wrapper for the Vader sentiment analyzer to get `vader_sentiment_cat`.
 
 
 ## References
