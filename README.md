@@ -13,12 +13,12 @@ following to the end of the header
   accompanying embeddings file and average the combined embeddings of the string.
   * `num` : For each item in a space separated string, count the item, and use the resulting count as a feature
   
-
+text_bow pos_num neg_num has_pos_bool has_neg_bool vader_sentiment_cat 
 Here is a (truncated) example from the review polarity dataset provided in the `resources` folder:
 
-| doc_id        | text_bow      | text_embeddings  | positive_num     | negative_num     
-| ------------- |---------------| -----------------| -----------------| -----------------
-| cv700_21947.txt | latest bond film  | latest bond film |positive_word positive_word | negative_word negative_word negative_word 
+| doc_id        | text_bow      | text_embeddings  | pos_num     | neg_num     |has_pos_bool | has_neg_bool| vader_sentiment_cat| target
+| ------------- |---------------| -----------------| -----------------| -----------------| -----------------| -----------------| -----------------| -----------------
+| cv700_21947.txt | latest bond film  | latest bond film |0.53| 0.23 | True | True | positive | pos
 
 `text_bow` will be processed as a vector of tf-idf-weighted counts, `text_embeddings` will undergo the mean-embeddings transformation described above and `positive_` and `negative_num` will be transformed into real-valued features. 
 
