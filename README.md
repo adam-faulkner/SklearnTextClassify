@@ -21,7 +21,7 @@ Here is a (truncated) example from the review polarity dataset provided in the `
 | ------------- |---------------| -----------------| -----------------| -----------------| -----------------| -----------------| -----------------| -----------------
 | cv700_21947.txt | latest bond film  | latest bond film |0.53| 0.23 | True | True | positive | pos
 
-`text_bow` will be processed as a vector of tf-idf-weighted counts, `text_embeddings` will undergo the mean-embeddings transformation described above. The rest of features are self-explanatory.
+`text_bow` will be processed as a vector of tf-idf-weighted counts, `text_embeddings` will undergo the mean-embeddings transformation described above. The rest of the features are self-explanatory.
 
 `cli.py` provides all of the required functionality.  All commands can be viewed via `-h`:
 
