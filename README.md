@@ -119,8 +119,10 @@ Accuracy: 0.802
   
 ## Embeddings
 
-By default, the code will look for `GoogleNews-vectors-negative300.txt` (or `.bin`) in the `resources` folder. Get these  from [here](https://github.com/mmihaltz/word2vec-GoogleNews-vectors). 
-
+By default, the code will look for `GoogleNews-vectors-negative300.txt` (or `.bin`) in the `resources` folder. Get these via
+```
+wget -c "https://s3.amazonaws.com/dl4j-distribution/GoogleNews-vectors-negative300.bin.gz"
+```
 
 ## Notes
 
